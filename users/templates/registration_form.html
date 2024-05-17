@@ -68,6 +68,11 @@
             {% if form.username.errors %}
             <p class="error">{{ form.username.errors }}</p>
             {% endif %}
+            <label for="id_full_name">Full Name:</label>
+            {{ form.full_name }}
+            {% if form.full_name.errors %}
+                <p class="error">{{ form.full_name.errors }}</p>
+            {% endif %}
             <label for="id_email">Email:</label>
             {{ form.email }}
             {% if form.email.errors %}

@@ -7,18 +7,11 @@ User = get_user_model()
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField()
+    full_name = forms.CharField(label="Full Name")
 
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ('username', 'email', 'personal_number', 'birth_date', 'is_staff', 'is_user')
-
-    def clean(self):
-        cleaned_data = super().clean()
-        is_staff = cleaned_data.get('is_staff')
-        is_user = cleaned_data.get('is_user')
-        if is_staff and is_user:
-            raise forms.ValidationError("You cannot be both staff and user.")
-        return cleaned_data
+        fields = ('username', 'email', 'full_name', 'personal_number', 'birth_date')
 
     def clean_email(self):
         email = self.cleaned_data['email']

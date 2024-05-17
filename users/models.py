@@ -6,8 +6,10 @@ from django.utils.translation import gettext_lazy as _
 
 class CustomUser(AbstractUser):
     email = models.EmailField(_('email address'), unique=True)
+    full_name = models.CharField(_('full name'), max_length=150)
     personal_number = models.CharField(
         max_length=11,
+        unique=True,
         validators=[RegexValidator(r'^\d{11}$', 'Personal number must be 11 digits.')]
     )
     birth_date = models.DateField(null=True, blank=False)
@@ -16,7 +18,7 @@ class CustomUser(AbstractUser):
     is_user = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'birth_date']
+    REQUIRED_FIELDS = ['username', 'full_name', 'birth_date']
 
     def save(self, *args, **kwargs):
         if not self.pk:
