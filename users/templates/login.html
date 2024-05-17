@@ -8,15 +8,20 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
 
         .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
+            width: 350px;
+            padding: 30px;
             background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
@@ -28,10 +33,58 @@
             margin-top: 20px;
         }
 
+        label {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
         .error {
-            color: #ff0000;
+            color: red;
             margin-top: 5px;
             font-size: 14px;
+        }
+
+        .field-error {
+            color: #ff0000;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .register-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -40,17 +93,28 @@
         <h1>Login</h1>
         <form method="post">
             {% csrf_token %}
-            {% if form.errors %}
-                <p class="error">{{ form.errors }}</p>
+            {% if form.non_field_errors %}
+                <p class="error">{{ form.non_field_errors }}</p>
             {% endif %}
-            {{ form.email.errors }}
-            <label for="id_email">Email:</label>
-            <input type="email" id="id_email" name="email" value="{{ form.initial.email }}" required autofocus>
-            {{ form.password.errors }}
-            <label for="id_password">Password:</label>
-            <input type="password" id="id_password" name="password" required>
+            <div>
+                <label for="id_email">Email:</label>
+                <input type="email" id="id_email" name="email" value="{{ form.email.value }}" required autofocus>
+                {% if form.email.errors %}
+                    <p class="field-error">{{ form.email.errors }}</p>
+                {% endif %}
+            </div>
+            <div>
+                <label for="id_password">Password:</label>
+                <input type="password" id="id_password" name="password" required>
+                {% if form.password.errors %}
+                    <p class="field-error">{{ form.password.errors }}</p>
+                {% endif %}
+            </div>
             <button type="submit">Login</button>
         </form>
+        <div class="register-link">
+            <p>If you don't have an account, <a href="/users/register">register here</a>.</p>
+        </div>
     </div>
 </body>
 </html>

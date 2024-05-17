@@ -37,7 +37,7 @@
             border-radius: 4px;
         }
         .error {
-            color: #ff0000;
+            color: red;
             margin-top: 5px;
         }
         .info {
@@ -55,6 +55,17 @@
         }
         button:hover {
             background-color: #45a049;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .login-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -106,6 +117,9 @@
             {% endif %}
             <button type="submit">Register</button>
         </form>
+        <div class="login-link">
+            <p>If you already have an account, <a href="/users/login">login here</a>.</p>
+        </div>
     </div>
 </body>
 </html>

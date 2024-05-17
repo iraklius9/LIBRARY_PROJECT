@@ -1,31 +1,26 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser
-
-
-class CustomUserCreationForm(UserCreationForm):
-    class Meta(UserCreationForm.Meta):
-        model = CustomUser
-        fields = ('username', 'email', 'password1', 'password2', 'personal_number', 'birth_date')
+from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
+    model = CustomUser
 
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal info',
-         {'fields': ('username', 'full_name', 'personal_number', 'birth_date', 'is_staff')}),
-        ('Permissions', {'fields': ('is_active', 'groups', 'user_permissions')}),
+        ('Personal info', {'fields': ('username', 'full_name', 'personal_number', 'birth_date')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'groups', 'user_permissions')}),
     )
 
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
             'fields': (
-                'email', 'password1', 'password2', 'username', 'full_name', 'is_staff', 'personal_number',
-                'birth_date'),
+                'email', 'password1', 'password2', 'username', 'full_name', 'personal_number', 'birth_date',
+                'is_staff'),
         }),
     )
 
