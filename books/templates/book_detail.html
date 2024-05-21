@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.title }} - Book Detail</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .book-info {
+            margin-bottom: 20px;
+        }
+
+        .book-info img {
+            width: 100%; /* Make image responsive */
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add shadow for better visual */
+        }
+
+        .book-info p {
+            font-size: 18px;
+            color: #333;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>{{ book.title }}</h1>
+
+    <div class="book-info">
+        <img src="{{ book.image.url }}" alt="{{ book.title }}">
+        <p><strong>Author:</strong> {{ book.author }}</p>
+
+        <!-- Iterate over genres -->
+        <p><strong>Genre:</strong>
+            {% for genre in book.genre.all %}
+                {{ genre.name }}
+                {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+
+        <p><strong>Publication Date:</strong> {{ book.publication_date }}</p>
+        <p><strong>Stock Quantity:</strong> {{ book.stock_quantity }}</p>
+
+
+        <!-- Add other book details as needed -->
+    </div>
+</div>
+</body>
+</html>
