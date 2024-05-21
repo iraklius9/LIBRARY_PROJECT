@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 
 class Genre(models.Model):
@@ -22,7 +23,7 @@ class Book(models.Model):
     title = models.CharField(max_length=200)
     publication_date = models.DateField()
     stock_quantity = models.IntegerField()
-    image = models.ImageField(upload_to='book_images', null=True, blank=True, default='book_images/1.jpg')
+    image = models.ImageField(upload_to='book_images', null=True, blank=True, default='book_images/2.jpg')
 
     def __str__(self):
         return self.title
@@ -50,3 +51,17 @@ class BookInstance(models.Model):
 
     def __str__(self):
         return f'{self.book.title}'
+
+
+class Reservation(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    reserved_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.user.name} reserved {self.book.title}"
+
+    @property
+    def is_expired(self):
+        return self.expires_at < timezone.now()

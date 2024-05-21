@@ -1,13 +1,18 @@
-from django.conf.urls.static import static
 from django.urls import path
 
-from LIBRARY_PROJECT import settings
-from books.views import staff, library, book_detail
+from books import views
+from books.api_views import api_return_book, api_reserve_book
+
+app_name = 'books'
 
 urlpatterns = [
-    path('library/', library, name='library'),
-    path('staff/', staff, name='staff'),
-    path('book/<int:book_id>/', book_detail, name='book_detail')
+    path('library/', views.library, name='library'),
+    path('staff/', views.staff, name='staff'),
+    path('book/<int:pk>/', views.book_detail, name='book_detail'),
+    path('return/', views.return_book, name='return_book'),
+    path('books/reserve/<int:pk>/', views.reserve_book, name='reserve_book'),
+
+    path('api/reserve/', api_reserve_book, name='api_reserve_book'),
+    path('api/return/', api_return_book, name='api_return_book'),
 
 ]
-

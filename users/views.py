@@ -38,9 +38,9 @@ def user_login(request):
             if user is not None:
                 login(request, user)
                 if user.is_user:
-                    return redirect('library')
+                    return redirect('books:library')
                 elif user.is_staff:
-                    return redirect('staff')
+                    return redirect('books:staff')
             else:
                 form.add_error(None, 'Invalid email or password')
                 messages.error(request, 'Invalid email or password')

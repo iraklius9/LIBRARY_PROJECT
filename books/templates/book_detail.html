@@ -10,15 +10,19 @@
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
 
         .container {
             max-width: 600px;
-            margin: 20px auto;
             padding: 20px;
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
         h1 {
@@ -32,17 +36,53 @@
         }
 
         .book-info img {
-            width: 100%; /* Make image responsive */
+            width: 100%;
             display: block;
             margin: 0 auto;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add shadow for better visual */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .book-info p {
             font-size: 18px;
             color: #333;
             margin: 10px 0;
+        }
+
+        .reservation-button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .reservation-button:hover {
+            background-color: #218838;
+        }
+
+        .details-button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .details-button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -54,7 +94,6 @@
         <img src="{{ book.image.url }}" alt="{{ book.title }}">
         <p><strong>Author:</strong> {{ book.author }}</p>
 
-        <!-- Iterate over genres -->
         <p><strong>Genre:</strong>
             {% for genre in book.genre.all %}
                 {{ genre.name }}
@@ -64,10 +103,38 @@
 
         <p><strong>Publication Date:</strong> {{ book.publication_date }}</p>
         <p><strong>Stock Quantity:</strong> {{ book.stock_quantity }}</p>
-
-
-        <!-- Add other book details as needed -->
     </div>
+
+    <div class="reservation-form">
+        {% if not user_has_reservation %}
+            <form id="reservation-form" method="post" action="{% url 'books:reserve_book' book.id %}">
+                {% csrf_token %}
+                <button id="reserve-button" type="submit" class="reservation-button">Reserve Book</button>
+            </form>
+        {% else %}
+            {% if expiration_date %}
+                <div id="expiration-date-container">
+                    <p><strong>Expiration Date:</strong> <span>{{ expiration_date }}</span></p>
+                </div>
+            {% endif %}
+            <div id="message" style="color: darkgreen;">
+                {% if expiration_date %}
+                    Book reserved successfully. It will be reserved until {{ expiration_date }}.
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    {% if messages %}
+        <div>
+            {% for message in messages %}
+                <p style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %};">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <br><a href="{% url 'books:library' %}" class="details-button">View books</a>
 </div>
+
 </body>
 </html>

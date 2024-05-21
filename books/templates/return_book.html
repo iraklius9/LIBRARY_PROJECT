@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Return Book</title>
+</head>
+<body>
+    <h1>Return Book</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="book">Select the book to return:</label>
+        <select id="book" name="book">
+            {% for book in books %}
+                <option value="{{ book.id }}">{{ book.title }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Return Book</button>
+    </form>
+</body>
+</html>
