@@ -6,7 +6,7 @@ This project is a Library Management System built using Django. It provides func
 
 ## Functionality
 
-1. **User Registration**: Library employees can register on the site with required fields such as email, password, full name, personal number, and birth date. Admin can also add employees through the admin panel.
+1. **User Registration**: Users can register on the site with required fields such as email, password, full name, personal number, and birth date. Admin can also add employees through the admin panel.
 
 2. **Authorization**: Users of the working group can authorize on the site.
 
