@@ -3,11 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Start Page</title>
+    <title>Welcome to the Library</title>
+    <!-- Include Bootstrap CSS for styling -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            color: #343a40;
+        }
+        .btn {
+            width: 150px;
+            margin: 10px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #565e64;
+            border-color: #434a50;
+        }
+    </style>
 </head>
 <body>
     <h1>Welcome to the Library!</h1>
-    <a href="{% url 'login' %}"><button>Login</button></a>
-    <a href="{% url 'register' %}"><button>Register</button></a>
+    <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+    <a href="{% url 'register' %}" class="btn btn-secondary">Register</a>
+
+    <!-- Include jQuery and Bootstrap JS for functionality (optional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

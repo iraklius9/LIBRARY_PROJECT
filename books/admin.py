@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Book, Author, Genre, BookInstance
+from .models import Book, Author, Genre, BookInstance, BorrowingHistory
 
 
 class BookInstanceInline(admin.TabularInline):
@@ -12,6 +12,11 @@ class BookInstanceAdmin(admin.ModelAdmin):
     list_filter = ['status', 'borrowed_date', 'returned_date']
     search_fields = ['book__title', 'borrower__email']
     date_hierarchy = 'borrowed_date'
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Exclude book instances with status 'Returned'
+        return qs.exclude(status='Returned')
 
 
 class AuthorFilter(admin.SimpleListFilter):
@@ -60,8 +65,15 @@ class BookAdmin(admin.ModelAdmin):
     get_num_published.short_description = 'Total Published'
 
 
+class BorrowingHistoryAdmin(admin.ModelAdmin):
+    list_display = ['book_instance', 'borrower', 'borrowing_date']
+    list_filter = ['borrowing_date']
+    search_fields = ['book__title', 'borrower__email']
+    date_hierarchy = 'borrowing_date'
+
+
 admin.site.register(Book, BookAdmin)
 admin.site.register(Author)
 admin.site.register(Genre)
 admin.site.register(BookInstance, BookInstanceAdmin)
-
+admin.site.register(BorrowingHistory, BorrowingHistoryAdmin)

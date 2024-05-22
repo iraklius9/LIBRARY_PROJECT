@@ -29,7 +29,7 @@ class Book(models.Model):
         return self.title
 
     def num_borrowed(self):
-        return self.bookinstance_set.filter(status='On loan').count()
+        return BorrowingHistory.objects.filter(book=self).count()
 
     def num_published(self):
         return self.bookinstance_set.count()
@@ -41,13 +41,14 @@ class BookInstance(models.Model):
         ('On loan', 'On loan'),
         ('Maintenance', 'Maintenance'),
         ('Reserved', 'Reserved'),
+        ('Returned', 'Returned'),
     ]
 
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     borrower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     borrowed_date = models.DateField(null=True, blank=True)
     returned_date = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Maintenance')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='On loan')
 
     def __str__(self):
         return f'{self.book.title}'
@@ -65,3 +66,13 @@ class Reservation(models.Model):
     @property
     def is_expired(self):
         return self.expires_at < timezone.now()
+
+
+class BorrowingHistory(models.Model):
+    book_instance = models.ForeignKey(BookInstance, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)  # Add this line
+    borrower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    borrowing_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.book.title} borrowed by {self.borrower.username} on {self.borrowing_date}"

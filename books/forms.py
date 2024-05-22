@@ -32,3 +32,14 @@ class BorrowForm(forms.ModelForm):
         if book and book.stock_quantity <= 0:
             raise forms.ValidationError("The selected book is not available for borrowing.")
         return cleaned_data
+
+
+class ReturnBookForm(forms.Form):
+    book = forms.ModelChoiceField(
+        queryset=Book.objects.all(),
+        widget=forms.Select(attrs={'class': 'searchable'})
+    )
+    borrower = forms.ModelChoiceField(
+        queryset=CustomUser.objects.all(),
+        widget=forms.Select(attrs={'class': 'searchable'})
+    )
