@@ -2,10 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>welcome to staff page</title>
+    <title>Staff Dashboard</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include select2 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 </head>
 <body>
-<h1>welcome</h1>
+    <div class="container">
+        <h1 class="mt-5">Staff Dashboard</h1>
 
+        <!-- Borrow Form -->
+        <h2 class="mt-4">Mark Book as Borrowed</h2>
+        {% if error_message %}
+            <div class="alert alert-danger">
+                {{ error_message }}
+            </div>
+        {% endif %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <form method="post" action="{% url 'books:staff' %}" class="mb-5">
+            {% csrf_token %}
+            {{ borrow_form.as_p }}
+            <button type="submit" class="btn btn-primary">Mark as Borrowed</button>
+        </form>
+    </div>
+
+    <!-- Include jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Include select2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.searchable').select2({
+                width: '100%'
+            });
+        });
+    </script>
 </body>
 </html>

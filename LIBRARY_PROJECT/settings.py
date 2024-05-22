@@ -93,7 +93,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 LANGUAGE_CODE = 'ka-ge'
 
 TIME_ZONE = 'Asia/Tbilisi'
@@ -103,7 +102,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
@@ -120,3 +118,6 @@ AUTH_USER_MODEL = 'users.CustomUser'
 CRONJOBS = [
     ('0 0 * * *', 'books.management.commands.increase_stock.Command'),
 ]
+
+LOGIN_URL = '/login/'
+LOGOUT_REDIRECT_URL = '/login/'

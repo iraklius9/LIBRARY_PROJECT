@@ -7,6 +7,13 @@ class BookInstanceInline(admin.TabularInline):
     extra = 0
 
 
+class BookInstanceAdmin(admin.ModelAdmin):
+    list_display = ['book', 'borrower', 'borrowed_date', 'returned_date', 'status']
+    list_filter = ['status', 'borrowed_date', 'returned_date']
+    search_fields = ['book__title', 'borrower__email']
+    date_hierarchy = 'borrowed_date'
+
+
 class AuthorFilter(admin.SimpleListFilter):
     title = 'Author'
     parameter_name = 'author'
@@ -36,7 +43,8 @@ class GenreFilter(admin.SimpleListFilter):
 
 
 class BookAdmin(admin.ModelAdmin):
-    list_display = ['title', 'author', 'publication_date', 'stock_quantity', 'get_num_borrowed', 'get_num_published', 'image']
+    list_display = ['title', 'author', 'publication_date', 'stock_quantity', 'get_num_borrowed', 'get_num_published',
+                    'image']
     list_filter = ['publication_date', AuthorFilter, GenreFilter]
     search_fields = ['title', 'author__name']
     inlines = [BookInstanceInline]
@@ -55,5 +63,5 @@ class BookAdmin(admin.ModelAdmin):
 admin.site.register(Book, BookAdmin)
 admin.site.register(Author)
 admin.site.register(Genre)
-admin.site.register(BookInstance)
+admin.site.register(BookInstance, BookInstanceAdmin)
 

@@ -3,6 +3,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth.decorators import login_required
+from django.db.models import F
+from django.contrib import messages
+from books.forms import BorrowForm
 from books.models import Book, Reservation
 
 
@@ -69,8 +72,44 @@ def book_detail(request, pk):
     return render(request, 'book_detail.html', context)
 
 
+@login_required
 def staff(request):
-    return render(request, 'staff.html')
+    borrow_form = BorrowForm(request.POST or None)
+
+    if request.method == 'POST':
+        if borrow_form.is_valid():
+            borrow_instance = borrow_form.save(commit=False)
+            if borrow_instance.returned_date < borrow_instance.borrowed_date:
+                error_message = 'Returned date cannot be before borrowed date.'
+                context = {'borrow_form': borrow_form, 'error_message': error_message}
+                return render(request, 'staff.html', context)
+
+            borrow_instance.save()
+            book_id = borrow_instance.book.id
+            Book.objects.filter(id=book_id).update(stock_quantity=F('stock_quantity') - 1)
+            messages.success(request, 'Book has been successfully marked as borrowed.')
+            return redirect('books:staff')
+
+    context = {'borrow_form': borrow_form}
+    return render(request, 'staff.html', context)
+
+
+def mark_returned(request):
+    if request.method == 'POST':
+        book_id = request.POST.get('book_id_return')
+
+        # Retrieve the book
+        book = get_object_or_404(Book, pk=book_id)
+
+        # Update book status and reset borrower
+        book.borrowed = False
+        book.borrower = None
+        book.save()
+
+        # Delete the reservation record
+        Reservation.objects.filter(book=book, user=request.user).delete()
+
+        return redirect('books:staff')
 
 
 @login_required
@@ -92,14 +131,3 @@ def reserve_book(request, pk):
 
         return redirect('books:book_detail', pk=book.pk)
     return redirect('books:book_detail', pk=book.pk)
-
-
-@login_required
-def return_book(request, pk):
-    book = get_object_or_404(Book, pk=pk)
-    if request.method == "POST":
-        reservation = Reservation.objects.filter(book=book, user=request.user).first()
-        if reservation:
-            reservation.delete()
-        return redirect('books:book_detail', pk=book.id)
-    return redirect('books:book_detail', pk=book.id)

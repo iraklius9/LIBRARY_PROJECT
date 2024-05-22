@@ -29,7 +29,7 @@ class Book(models.Model):
         return self.title
 
     def num_borrowed(self):
-        return self.bookinstance_set.filter(borrower__isnull=False, returned_date__isnull=True).count()
+        return self.bookinstance_set.filter(status='On loan').count()
 
     def num_published(self):
         return self.bookinstance_set.count()
@@ -37,7 +37,7 @@ class Book(models.Model):
 
 class BookInstance(models.Model):
     STATUS_CHOICES = [
-        ('Available', 'Available'),
+
         ('On loan', 'On loan'),
         ('Maintenance', 'Maintenance'),
         ('Reserved', 'Reserved'),
