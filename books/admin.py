@@ -1,5 +1,10 @@
 from django.contrib import admin
-from .models import Book, Author, Genre, BookInstance, BorrowingHistory
+from .models import Book, Author, Genre, BookInstance, BorrowingHistory, Reservation
+
+
+class BorrowingHistoryInline(admin.TabularInline):
+    model = BorrowingHistory
+    extra = 0
 
 
 class BookInstanceInline(admin.TabularInline):
@@ -52,7 +57,7 @@ class BookAdmin(admin.ModelAdmin):
                     'image']
     list_filter = ['publication_date', AuthorFilter, GenreFilter]
     search_fields = ['title', 'author__name']
-    inlines = [BookInstanceInline]
+    inlines = [BookInstanceInline, BorrowingHistoryInline]
 
     def get_num_borrowed(self, obj):
         return obj.num_borrowed()
@@ -66,10 +71,16 @@ class BookAdmin(admin.ModelAdmin):
 
 
 class BorrowingHistoryAdmin(admin.ModelAdmin):
-    list_display = ['book_instance', 'borrower', 'borrowing_date']
+    list_display = ['book_instance', 'borrower', 'borrowing_date', 'returning_date']
     list_filter = ['borrowing_date']
     search_fields = ['book__title', 'borrower__email']
     date_hierarchy = 'borrowing_date'
+
+
+class ReservationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'book', 'reserved_at', 'expires_at')
+    list_filter = ('reserved_at', 'expires_at')
+    search_fields = ('user__username', 'book__title')
 
 
 admin.site.register(Book, BookAdmin)
@@ -77,3 +88,4 @@ admin.site.register(Author)
 admin.site.register(Genre)
 admin.site.register(BookInstance, BookInstanceAdmin)
 admin.site.register(BorrowingHistory, BorrowingHistoryAdmin)
+admin.site.register(Reservation, ReservationAdmin)

@@ -7,6 +7,7 @@ from django.db.models import F
 from django.contrib import messages
 from books.forms import BorrowForm, ReturnBookForm
 from books.models import Book, Reservation, BookInstance, BorrowingHistory
+from django.db import transaction
 
 
 @login_required
@@ -79,17 +80,34 @@ def staff(request):
     if request.method == 'POST':
         if borrow_form.is_valid():
             borrow_instance = borrow_form.save(commit=False)
+
+            # Check if the selected user has already borrowed the book
+            existing_borrow_instance = BookInstance.objects.filter(
+                book=borrow_instance.book,
+                borrower=borrow_instance.borrower,
+                status='On loan'
+            ).first()
+
+            if existing_borrow_instance:
+                error_message = (f"{borrow_instance.borrower} has already borrowed this book. Please return it before "
+                                 f"borrowing again.")
+                messages.error(request, error_message)
+                return redirect('books:staff')
+
             if borrow_instance.returned_date and borrow_instance.returned_date < borrow_instance.borrowed_date:
                 error_message = 'Returned date cannot be before borrowed date.'
                 context = {'borrow_form': borrow_form, 'error_message': error_message}
                 return render(request, 'staff.html', context)
 
-            borrow_instance.status = 'On loan'
-            borrow_instance.save()
+            with transaction.atomic():
+                borrow_instance.status = 'On loan'
+                borrow_instance.save()
 
-            Book.objects.filter(id=borrow_instance.book.id).update(stock_quantity=F('stock_quantity') - 1)
-            messages.success(request, 'Book has been successfully marked as borrowed.')
-            return redirect('books:staff')
+                # Update the stock quantity of the associated book
+                Book.objects.filter(id=borrow_instance.book.id).update(stock_quantity=F('stock_quantity') - 1)
+
+                messages.success(request, 'Book has been successfully marked as borrowed.')
+                return redirect('books:staff')
 
     context = {'borrow_form': borrow_form}
     return render(request, 'staff.html', context)
@@ -102,20 +120,27 @@ def return_book(request):
         if form.is_valid():
             book = form.cleaned_data['book']
             borrower = form.cleaned_data['borrower']
+            returning_date = form.cleaned_data['returning_date']
+
             try:
                 # Get the book instance based on book and borrower
-                book_instance = BookInstance.objects.get(book=book, borrower=borrower)
-                # Increase the stock quantity of the associated book by one
-                book.stock_quantity += 1
-                book.save()
+                book_instance = BookInstance.objects.get(book=book, borrower=borrower, status='On loan')
+                # Update the stock quantity of the associated book by one
+                book_instance.book.stock_quantity += 1
+                book_instance.book.save()
                 # Update the status to 'Returned'
                 book_instance.status = 'Returned'
+                # Optionally set the returning date if provided
+                if returning_date:
+                    book_instance.returned_date = returning_date
                 book_instance.save()
+
                 # Create a borrowing history entry for returning
                 BorrowingHistory.objects.create(
                     book_instance=book_instance,
                     book=book_instance.book,
-                    borrower=borrower,  # Use the borrower from the form
+                    borrower=borrower,
+                    returning_date=returning_date or timezone.now()  # Use the provided date or current time
                 )
                 messages.success(request, 'Book has been successfully marked as returned.')
             except BookInstance.DoesNotExist:
@@ -131,17 +156,15 @@ def return_book(request):
 def reserve_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
     if request.method == "POST":
-        # Check for any expired reservations and handle them
-        expired_reservations = Reservation.objects.filter(book=book, expires_at__lt=timezone.now())
-        for reservation in expired_reservations:
-            book.stock_quantity += 1
-            book.save()
-            reservation.delete()
 
         user_reservation = Reservation.objects.filter(book=book, user=request.user).first()
         if not user_reservation:
-            book.stock_quantity -= 1
-            book.save()
+            if book.stock_quantity > 0:
+                book.stock_quantity -= 1
+                book.save()
+            else:
+                messages.warning(request, 'No stock available for this book.')
+                return redirect('books:book_detail', pk=book.pk)
 
             reservation = Reservation(
                 book=book,
@@ -155,4 +178,22 @@ def reserve_book(request, pk):
             messages.warning(request, 'You have already reserved this book.')
 
         return redirect('books:book_detail', pk=book.pk)
+    return redirect('books:book_detail', pk=book.pk)
+
+
+@login_required
+def cancel_reservation(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    user_reservation = Reservation.objects.filter(book=book, user=request.user).first()
+
+    if user_reservation:
+        book.stock_quantity += 1
+        book.save()
+
+        user_reservation.delete()
+
+        messages.success(request, 'Reservation canceled successfully.')
+    else:
+        messages.error(request, 'You do not have a reservation for this book.')
+
     return redirect('books:book_detail', pk=book.pk)

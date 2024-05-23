@@ -91,7 +91,8 @@
     <h1>{{ book.title }}</h1>
 
     <div class="book-info">
-        <img src="{{ book.image.url }}" alt="{{ book.title }}">
+        <br><br><img src="{{ book.image.url }}" alt="{{ book.title }}">
+        <p><strong>Book:</strong> {{ book.title }}</p>
         <p><strong>Author:</strong> {{ book.author }}</p>
 
         <p><strong>Genre:</strong>
@@ -112,6 +113,10 @@
                 <button id="reserve-button" type="submit" class="reservation-button">Reserve Book</button>
             </form>
         {% else %}
+            <form id="cancel-reservation-form" method="post" action="{% url 'books:cancel_reservation' book.id %}">
+                {% csrf_token %}
+                <button id="cancel-reservation-button" type="submit" class="reservation-button">Cancel Reservation</button>
+            </form>
             {% if expiration_date %}
                 <div id="expiration-date-container">
                     <p><strong>Expiration Date:</strong> <span>{{ expiration_date }}</span></p>

@@ -46,8 +46,8 @@ class BookInstance(models.Model):
 
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     borrower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
-    borrowed_date = models.DateField(null=True, blank=True)
-    returned_date = models.DateField(null=True, blank=True)
+    borrowed_date = models.DateField(null=False, blank=False)
+    returned_date = models.DateField(null=False, blank=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='On loan')
 
     def __str__(self):
@@ -60,9 +60,6 @@ class Reservation(models.Model):
     reserved_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
 
-    def __str__(self):
-        return f"{self.user.name} reserved {self.book.title}"
-
     @property
     def is_expired(self):
         return self.expires_at < timezone.now()
@@ -73,6 +70,8 @@ class BorrowingHistory(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)  # Add this line
     borrower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     borrowing_date = models.DateTimeField(auto_now_add=True)
+    returning_date = models.DateTimeField(null=True, blank=True)
 
-    def __str__(self):
-        return f"{self.book.title} borrowed by {self.borrower.username} on {self.borrowing_date}"
+
+def __str__(self):
+    return f"{self.book.title} borrowed by {self.borrower.username} on {self.borrowing_date}"

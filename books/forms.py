@@ -4,6 +4,7 @@ from users.models import CustomUser
 
 
 class BorrowForm(forms.ModelForm):
+
     book = forms.ModelChoiceField(
         queryset=Book.objects.all(),
         widget=forms.Select(attrs={'class': 'searchable'})
@@ -35,6 +36,8 @@ class BorrowForm(forms.ModelForm):
 
 
 class ReturnBookForm(forms.Form):
+    returning_date = forms.DateField(label='Returning Date', required=False,
+                                     widget=forms.DateInput(attrs={'type': 'date'}))
     book = forms.ModelChoiceField(
         queryset=Book.objects.all(),
         widget=forms.Select(attrs={'class': 'searchable'})
