@@ -1,12 +1,10 @@
-# books/management/commands/check_expired_reservations.py
-
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from books.models import Book, Reservation
+from books.models import Reservation
 
 
 class Command(BaseCommand):
-    help = 'Increase stock count of books that have expired reservations'
+    help = 'Increase stock count of books and cancel expired reservations'
 
     def handle(self, *args, **kwargs):
         expired_reservations = Reservation.objects.filter(expires_at__lt=timezone.now())
@@ -15,4 +13,4 @@ class Command(BaseCommand):
             book.stock_quantity += 1
             book.save()
             reservation.delete()
-            self.stdout.write(self.style.SUCCESS(f'Stock increased for book {book.title}'))
+            self.stdout.write(self.style.SUCCESS(f'Stock increased for book {book.title} and reservation canceled'))

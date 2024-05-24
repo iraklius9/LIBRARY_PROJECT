@@ -32,7 +32,6 @@
 <div class="container mt-5">
     <h1 class="text-center mb-4">Book List</h1>
 
-    <!-- Search bar -->
     <form action="" method="GET" class="mb-4">
         <div class="input-group">
             <input type="text" name="query" class="form-control" placeholder="Search books...">
@@ -43,7 +42,6 @@
     </form>
 
     {% if books %}
-        <!-- Display search results -->
         {% for book in books %}
             <div class="card mb-3">
                 <div class="row g-0">
@@ -66,7 +64,6 @@
             </div>
         {% endfor %}
 
-        <!-- Pagination -->
         {% if books.has_other_pages %}
             <ul class="pagination justify-content-center">
                 {% if books.has_previous %}
@@ -91,7 +88,6 @@
             </ul>
         {% endif %}
     {% else %}
-        <!-- Display message when no books found -->
         <div class="alert alert-warning" role="alert">
             No such book found.
         </div>

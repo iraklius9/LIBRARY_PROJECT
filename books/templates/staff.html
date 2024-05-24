@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Staff Dashboard</title>
-    <!-- Include Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Include select2 CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 </head>
 <body>
@@ -35,7 +33,6 @@
     <div class="container">
         <h1 class="mt-5">Staff Dashboard</h1>
 
-        <!-- Borrow Form -->
         <h2 class="mt-4">Mark Book as Borrowed</h2>
         {% if error_message %}
             <div class="alert alert-danger">
@@ -56,9 +53,7 @@
         </form>
     </div>
 
-    <!-- Include jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- Include select2 JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {

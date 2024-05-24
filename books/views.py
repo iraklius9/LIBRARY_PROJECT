@@ -139,10 +139,14 @@ def return_book(request):
             try:
                 # Get the book instance based on book and borrower
                 book_instance = BookInstance.objects.get(book=book, borrower=borrower, status='On loan')
+
+                # Get the borrowing date from the book instance
+                borrowing_date = book_instance.borrowed_date
+
                 # Update the stock quantity of the associated book by one
                 book_instance.book.stock_quantity += 1
-
                 book_instance.book.save()
+
                 # Update the status to 'Returned'
                 book_instance.status = 'Returned'
                 # Optionally set the returning date if provided
@@ -155,12 +159,13 @@ def return_book(request):
                     book_instance=book_instance,
                     book=book_instance.book,
                     borrower=borrower,
+                    borrowing_date=borrowing_date,  # Use the borrowing date from BookInstance
                     returning_date=returning_date or timezone.now()  # Use the provided date or current time
                 )
                 messages.success(request, 'Book has been successfully marked as returned.')
             except BookInstance.DoesNotExist:
                 messages.error(request, 'No matching book instance found for the given book and borrower.')
-            return redirect('books:staff')
+            return redirect('books:return_book')
     else:
         form = ReturnBookForm()
 

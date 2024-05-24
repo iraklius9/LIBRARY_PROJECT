@@ -28,11 +28,9 @@ class ReservationCreateAPIView(generics.CreateAPIView):
 
         mutable_data = request.data.copy()
 
-        # Add the selected user and expiration time to the mutable data
         mutable_data['user'] = selected_user.id
         mutable_data['expires_at'] = expires_at
 
-        # Now, use the mutable_data in the serializer
         serializer = self.get_serializer(data=mutable_data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)

@@ -14,6 +14,16 @@ class BookInstanceInline(admin.TabularInline):
     extra = 0
 
 
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
+
+
+class GenreAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
+
+
 class BookInstanceAdmin(admin.ModelAdmin):
     list_display = ['book', 'borrower', 'borrowed_date', 'returned_date', 'status']
     list_filter = ['status', 'borrowed_date', 'returned_date']
@@ -23,7 +33,6 @@ class BookInstanceAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        # Exclude book instances with status 'Returned'
         return qs.exclude(status='Returned')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -32,20 +41,6 @@ class BookInstanceAdmin(admin.ModelAdmin):
         elif db_field.name == 'borrower':
             kwargs['queryset'] = db_field.related_model.objects.all()
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-
-class AuthorFilter(admin.SimpleListFilter):
-    title = 'Author'
-    parameter_name = 'author'
-
-    def lookups(self, request, model_admin):
-        authors = Author.objects.all()
-        return [(author.id, author.name) for author in authors]
-
-    def queryset(self, request, queryset):
-        if self.value():
-            return queryset.filter(author__id=self.value())
-        return queryset
 
 
 class GenreFilter(admin.SimpleListFilter):
@@ -65,9 +60,11 @@ class GenreFilter(admin.SimpleListFilter):
 class BookAdmin(admin.ModelAdmin):
     list_display = ['title', 'author', 'publication_date', 'total_quantity', 'stock_quantity',
                     'get_num_published', 'reserved_quantity', 'get_num_borrowed']
-    list_filter = ['publication_date', AuthorFilter, GenreFilter]
+    list_filter = ['publication_date', GenreFilter]
     search_fields = ['title', 'author__name']
     inlines = [BookInstanceInline, BorrowingHistoryInline]
+    list_per_page = 6
+    raw_id_fields = ['author', 'genre']
 
     def get_num_borrowed(self, obj):
         return obj.num_borrowed()
@@ -96,8 +93,8 @@ class BorrowingHistoryAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Book, BookAdmin)
-admin.site.register(Author)
-admin.site.register(Genre)
 admin.site.register(BookInstance, BookInstanceAdmin)
 admin.site.register(BorrowingHistory, BorrowingHistoryAdmin)
 admin.site.register(Reservation, ReservationAdmin)
+admin.site.register(Genre, GenreAdmin)
+admin.site.register(Author, AuthorAdmin)

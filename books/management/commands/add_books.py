@@ -1,28 +1,28 @@
-from django.core.management.base import BaseCommand
-from django.utils import timezone
-from random import choice
-from string import ascii_letters, digits
-from books.models import Book, Author, Genre
 import random
-import datetime
+from django.core.management.base import BaseCommand
+from faker import Faker
+from books.models import Author, Genre, Book
 
 
 class Command(BaseCommand):
-    help = 'Add 1000 random books to the system'
+    help = 'Generate random books'
 
     def handle(self, *args, **kwargs):
-        authors = Author.objects.all()
-        genres = Genre.objects.all()
+        faker = Faker()
+        genres = ['Fiction', 'Non-fiction', 'Science', 'History', 'Fantasy', 'Biography', 'Children', 'Romance']
+        author_objs = [Author.objects.create(name=faker.name()) for _ in range(100)]
+        genre_objs = [Genre.objects.get_or_create(name=genre)[0] for genre in genres]
+        books = []
 
         for _ in range(1000):
-            title = ''.join(random.choices(ascii_letters + digits, k=10))
-            author = choice(authors)
-            genre = choice(genres)
-            publication_date = timezone.now() - datetime.timedelta(
-                days=random.randint(1, 3650))
-            stock_quantity = random.randint(1, 100)
+            title = faker.sentence(nb_words=4)
+            author = random.choice(author_objs)
+            genre = random.choice(genre_objs)
+            publication_date = faker.date_between(start_date='-50y', end_date='today')
+            stock_quantity = random.randint(1, 20)
+            books.append(
+                Book(title=title, author=author, publication_date=publication_date, stock_quantity=stock_quantity))
+            books[-1].save()
+            books[-1].genre.set([genre])
 
-            Book.objects.create(title=title, author=author, genre=genre, publication_date=publication_date,
-                                stock_quantity=stock_quantity)
-
-        self.stdout.write(self.style.SUCCESS('Successfully added 1000 random books'))
+        self.stdout.write(self.style.SUCCESS('Successfully generated books'))
