@@ -1,10 +1,9 @@
 from django import forms
-from books.models import BookInstance, Book
+from books.models import BookInstance, Book, BorrowingHistory
 from users.models import CustomUser
 
 
 class BorrowForm(forms.ModelForm):
-
     book = forms.ModelChoiceField(
         queryset=Book.objects.all(),
         widget=forms.Select(attrs={'class': 'searchable'})
@@ -36,8 +35,6 @@ class BorrowForm(forms.ModelForm):
 
 
 class ReturnBookForm(forms.Form):
-    returning_date = forms.DateField(label='Returning Date', required=False,
-                                     widget=forms.DateInput(attrs={'type': 'date'}))
     book = forms.ModelChoiceField(
         queryset=Book.objects.all(),
         widget=forms.Select(attrs={'class': 'searchable'})
@@ -46,3 +43,20 @@ class ReturnBookForm(forms.Form):
         queryset=CustomUser.objects.all(),
         widget=forms.Select(attrs={'class': 'searchable'})
     )
+    returning_date = forms.DateField(label='Returning Date', required=False,
+                                     widget=forms.DateInput(attrs={'type': 'date'}))
+
+
+class BorrowingHistoryAdminForm(forms.ModelForm):
+    book = forms.ModelChoiceField(
+        queryset=Book.objects.all(),
+        widget=forms.Select(attrs={'class': 'searchable'})
+    )
+
+    class Meta:
+        model = BorrowingHistory
+        fields = ['book', 'borrower', 'returning_date', 'borrowing_date']
+        widgets = {
+            'borrowing_date': forms.DateInput(attrs={'type': 'date'}),
+            'returning_date': forms.DateInput(attrs={'type': 'date'}),
+        }

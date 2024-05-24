@@ -9,6 +9,8 @@ from books.forms import BorrowForm, ReturnBookForm
 from books.models import Book, Reservation, BookInstance, BorrowingHistory
 from django.db import transaction
 
+from users.models import CustomUser
+
 
 @login_required
 def library(request):
@@ -107,6 +109,18 @@ def staff(request):
                 Book.objects.filter(id=borrow_instance.book.id).update(stock_quantity=F('stock_quantity') - 1)
 
                 messages.success(request, 'Book has been successfully marked as borrowed.')
+
+                # Check if the borrowing user has a reservation for this book
+                user_reservation = Reservation.objects.filter(
+                    book=borrow_instance.book,
+                    user=borrow_instance.borrower
+                ).first()
+
+                if user_reservation:
+                    # Cancel the reservation
+                    user_reservation.delete()
+                    messages.info(request, 'Reservation has been automatically canceled.')
+
                 return redirect('books:staff')
 
     context = {'borrow_form': borrow_form}
@@ -127,6 +141,7 @@ def return_book(request):
                 book_instance = BookInstance.objects.get(book=book, borrower=borrower, status='On loan')
                 # Update the stock quantity of the associated book by one
                 book_instance.book.stock_quantity += 1
+
                 book_instance.book.save()
                 # Update the status to 'Returned'
                 book_instance.status = 'Returned'
@@ -197,3 +212,22 @@ def cancel_reservation(request, pk):
         messages.error(request, 'You do not have a reservation for this book.')
 
     return redirect('books:book_detail', pk=book.pk)
+
+
+@login_required
+def check_reservations(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = CustomUser.objects.get(email=email)
+            user_reservations = Reservation.objects.filter(user=user)
+            if user_reservations:
+                return render(request, 'reservation_check.html', {'user_reservations': user_reservations})
+            else:
+                messages.info(request, 'You do not have any reservations.')
+                return render(request, 'reservation_check.html')
+        except CustomUser.DoesNotExist:
+            messages.error(request, 'User with this email does not exist.')
+            return render(request, 'reservation_check.html')
+
+    return render(request, 'reservation_check.html')

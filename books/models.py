@@ -32,7 +32,14 @@ class Book(models.Model):
         return BorrowingHistory.objects.filter(book=self).count()
 
     def num_published(self):
-        return self.bookinstance_set.count()
+        return self.bookinstance_set.filter(status='On loan').count()
+
+    def total_quantity(self):
+        reserved_books = Reservation.objects.filter(book=self).count()
+        return self.stock_quantity + self.num_published() + reserved_books
+
+    def reserved_quantity(self):
+        return Reservation.objects.filter(book=self).count()
 
 
 class BookInstance(models.Model):
@@ -69,7 +76,7 @@ class BorrowingHistory(models.Model):
     book_instance = models.ForeignKey(BookInstance, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)  # Add this line
     borrower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    borrowing_date = models.DateTimeField(auto_now_add=True)
+    borrowing_date = models.DateTimeField()
     returning_date = models.DateTimeField(null=True, blank=True)
 
 

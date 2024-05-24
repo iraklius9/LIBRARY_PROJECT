@@ -20,6 +20,9 @@
                     <a class="nav-link" href="{% url 'books:return_book'  %}">Go to Return Page</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'books:check_reservations' %}">Check User Reservations</a>
+                </li>
+                <li class="nav-item">
                     <form class="form-inline my-2 my-lg-0" method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
                         <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Logout</button>
