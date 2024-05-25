@@ -23,7 +23,6 @@ class BorrowForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Ensure that the queryset filters only books with positive stock quantity
         self.fields['book'].queryset = Book.objects.filter(stock_quantity__gt=0)
 
     def clean(self):

@@ -26,6 +26,6 @@ urlpatterns = [
                   path('users/', include('users.urls')),
                   path('books/', include('books.urls', namespace='books')),
                   path('api/', include('api.urls')),
-                  path('rest_framework/', include('rest_framework.urls')),
+                  # path('rest_framework/', include('rest_framework.urls')),
                   path('', views.home, name='home'),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

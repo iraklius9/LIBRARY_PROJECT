@@ -74,7 +74,7 @@ class Reservation(models.Model):
 
 class BorrowingHistory(models.Model):
     book_instance = models.ForeignKey(BookInstance, on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)  # Add this line
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
     borrower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     borrowing_date = models.DateTimeField()
     returning_date = models.DateTimeField(null=True, blank=True)

@@ -25,7 +25,7 @@ class GenreAdmin(admin.ModelAdmin):
 
 
 class BookInstanceAdmin(admin.ModelAdmin):
-    list_display = ['book', 'borrower', 'borrowed_date', 'returned_date', 'status']
+    list_display = ['id', 'book', 'borrower', 'borrowed_date', 'returned_date', 'status']
     list_filter = ['status', 'borrowed_date', 'returned_date']
     search_fields = ['book__title', 'borrower__email']
     date_hierarchy = 'borrowed_date'
@@ -41,6 +41,14 @@ class BookInstanceAdmin(admin.ModelAdmin):
         elif db_field.name == 'borrower':
             kwargs['queryset'] = db_field.related_model.objects.all()
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            book = obj.book
+            if book.stock_quantity > 0:
+                book.stock_quantity -= 1
+                book.save()
+        super().save_model(request, obj, form, change)
 
 
 class GenreFilter(admin.SimpleListFilter):
@@ -58,7 +66,7 @@ class GenreFilter(admin.SimpleListFilter):
 
 
 class BookAdmin(admin.ModelAdmin):
-    list_display = ['title', 'author', 'publication_date', 'total_quantity', 'stock_quantity',
+    list_display = ['id', 'title', 'author', 'publication_date', 'total_quantity', 'stock_quantity',
                     'get_num_published', 'reserved_quantity', 'get_num_borrowed']
     list_filter = ['publication_date', GenreFilter]
     search_fields = ['title', 'author__name']

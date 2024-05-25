@@ -30,7 +30,7 @@ def library(request):
 
     page = request.GET.get('page')
     if not filters_applied:
-        paginator = Paginator(books, 2)
+        paginator = Paginator(books, 6)
         try:
             books = paginator.page(page)
         except PageNotAnInteger:
@@ -83,7 +83,6 @@ def staff(request):
         if borrow_form.is_valid():
             borrow_instance = borrow_form.save(commit=False)
 
-            # Check if the selected user has already borrowed the book
             existing_borrow_instance = BookInstance.objects.filter(
                 book=borrow_instance.book,
                 borrower=borrow_instance.borrower,
@@ -105,19 +104,16 @@ def staff(request):
                 borrow_instance.status = 'On loan'
                 borrow_instance.save()
 
-                # Update the stock quantity of the associated book
                 Book.objects.filter(id=borrow_instance.book.id).update(stock_quantity=F('stock_quantity') - 1)
 
                 messages.success(request, 'Book has been successfully marked as borrowed.')
 
-                # Check if the borrowing user has a reservation for this book
                 user_reservation = Reservation.objects.filter(
                     book=borrow_instance.book,
                     user=borrow_instance.borrower
                 ).first()
 
                 if user_reservation:
-                    # Cancel the reservation
                     user_reservation.delete()
                     messages.info(request, 'Reservation has been automatically canceled.')
 
@@ -137,30 +133,24 @@ def return_book(request):
             returning_date = form.cleaned_data['returning_date']
 
             try:
-                # Get the book instance based on book and borrower
                 book_instance = BookInstance.objects.get(book=book, borrower=borrower, status='On loan')
 
-                # Get the borrowing date from the book instance
                 borrowing_date = book_instance.borrowed_date
 
-                # Update the stock quantity of the associated book by one
                 book_instance.book.stock_quantity += 1
                 book_instance.book.save()
 
-                # Update the status to 'Returned'
                 book_instance.status = 'Returned'
-                # Optionally set the returning date if provided
                 if returning_date:
                     book_instance.returned_date = returning_date
                 book_instance.save()
 
-                # Create a borrowing history entry for returning
                 BorrowingHistory.objects.create(
                     book_instance=book_instance,
                     book=book_instance.book,
                     borrower=borrower,
-                    borrowing_date=borrowing_date,  # Use the borrowing date from BookInstance
-                    returning_date=returning_date or timezone.now()  # Use the provided date or current time
+                    borrowing_date=borrowing_date,
+                    returning_date=returning_date or timezone.now()
                 )
                 messages.success(request, 'Book has been successfully marked as returned.')
             except BookInstance.DoesNotExist:
