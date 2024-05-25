@@ -29,10 +29,9 @@ class ReservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reservation
         fields = '__all__'
-        read_only_fields = ['book', 'expires_at']
+        read_only_fields = ['user', 'expires_at']
 
     def create(self, validated_data):
-
         request = self.context.get("request")
         expires_at = timezone.now() + timedelta(hours=24)
         validated_data["user"] = request.user
@@ -59,12 +58,9 @@ class ReservationSerializer2(serializers.ModelSerializer):
     class Meta:
         model = Reservation
         fields = '__all__'
-        read_only_fields = ['expires_at']
+        read_only_fields = ['expires_at', 'book']
 
     def create(self, validated_data):
-        """
-        Create and return a new Reservation instance.
-        """
         request = self.context.get("request")
         expires_at = timezone.now() + timedelta(hours=24)
         validated_data["user"] = request.user

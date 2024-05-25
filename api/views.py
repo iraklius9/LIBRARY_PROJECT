@@ -13,7 +13,7 @@ from users.models import CustomUser
 
 
 class ReservationCreateAPIView(generics.CreateAPIView):
-    serializer_class = ReservationSerializer2
+    serializer_class = ReservationSerializer
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
@@ -38,7 +38,7 @@ class ReservationCreateAPIView(generics.CreateAPIView):
 
 
 class ReservationCheckAPIView(generics.GenericAPIView):
-    serializer_class = ReservationSerializer
+    serializer_class = ReservationSerializer2
     permission_classes = [IsAdminUser]
 
     def post(self, request, *args, **kwargs):
@@ -109,9 +109,24 @@ class GenreListCreate(generics.ListCreateAPIView):
 
 
 class BookListCreate(generics.ListCreateAPIView):
-    queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Book.objects.all()
+        search_query = self.request.query_params.get('search', None)
+        if search_query:
+            queryset = queryset.filter(Q(title__icontains=search_query) | Q(author__icontains=search_query))
+        return queryset
+
+
+class SortedBookList(generics.ListAPIView):
+    serializer_class = BookSerializer
+
+    def get_queryset(self):
+        queryset = Book.objects.annotate(num_borrowings=Count('borrowinghistory'))
+        queryset = queryset.order_by('-num_borrowings')
+        return queryset
 
 
 class BookRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
@@ -129,7 +144,7 @@ class MostPopularBooksAPIView(generics.ListAPIView):
         return Book.objects.annotate(num_borrowed=Count('borrowinghistory')).order_by('-num_borrowed')[:10]
 
 
-class BooksBorrowedLastYearAPIView(generics.ListAPIView):
+class BooksBorrowedThisYearAPIView(generics.ListAPIView):
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
 

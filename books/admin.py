@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from .forms import BorrowingHistoryAdminForm
 from .models import Book, Author, Genre, BookInstance, BorrowingHistory, Reservation
 

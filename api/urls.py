@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import AuthorListCreate, GenreListCreate, BookListCreate, BookRetrieveUpdateDestroy, \
     ReservationCreateAPIView, ReservationCheckAPIView, MostPopularBooksAPIView, \
-    BooksBorrowedLastYearAPIView, TopLateReturnedBooksAPIView, TopLateReturnedUsersAPIView, BookReturnAPIView
+    BooksBorrowedThisYearAPIView, TopLateReturnedBooksAPIView, TopLateReturnedUsersAPIView, BookReturnAPIView, \
+    SortedBookList
 
 urlpatterns = [
     path('authors/', AuthorListCreate.as_view(), name='author-list-create'),
@@ -11,8 +12,9 @@ urlpatterns = [
     path('reserve/', ReservationCreateAPIView.as_view(), name='api_reserve_book'),
     path('check-reservation/', ReservationCheckAPIView.as_view(), name='api_check_reservation'),
     path('most-popular-books/', MostPopularBooksAPIView.as_view(), name='most-popular-books'),
-    path('books-borrowed-last-year/', BooksBorrowedLastYearAPIView.as_view(), name='books-borrowed-last-year'),
+    path('books-borrowed-this-year/', BooksBorrowedThisYearAPIView.as_view(), name='books-borrowed-this-year'),
     path('top-late-returned-books/', TopLateReturnedBooksAPIView.as_view(), name='top-late-returned-books'),
     path('top-late-returned-users/', TopLateReturnedUsersAPIView.as_view(), name='top-late-returned-users'),
     path('return/<int:pk>/', BookReturnAPIView.as_view(), name='book-return'),
+    path('books/sorted/', SortedBookList.as_view(), name='sorted-book-list'),
 ]
