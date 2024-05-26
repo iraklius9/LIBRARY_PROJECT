@@ -31,9 +31,9 @@
     </nav>
 
     <div class="container">
-        <h1 class="mt-5">Staff Dashboard</h1>
+        <h1 class="mt-5">Welcome {{ user.username }}</h1>
 
-        <h2 class="mt-4">Mark Book as Borrowed</h2>
+        <h2 class="mt-4">Here You Can Mark Book as Borrowed</h2>
         {% if error_message %}
             <div class="alert alert-danger">
                 {{ error_message }}
