@@ -106,7 +106,7 @@
             <p class="error">{{ form.personal_number.errors }}</p>
             {% endif %}
             <label for="id_birth_date">Birth Date:</label>
-            {{ form.birth_date }}
+            <input type="date" id="id_birth_date" name="birth_date">
             {% if form.birth_date.errors %}
             <p class="error">{{ form.birth_date.errors }}</p>
             {% endif %}
