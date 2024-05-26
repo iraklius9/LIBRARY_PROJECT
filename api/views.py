@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Count, F, Q
 from datetime import datetime, timedelta
+
+from django.shortcuts import render
 from django.utils import timezone
 from books.models import Author, Genre, Reservation, Book, BookInstance
 from api.serializers import BookSerializer, AuthorSerializer, GenreSerializer, ReservationSerializer, \
@@ -10,6 +12,12 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from users.models import CustomUser
+
+
+def book_list_view(request):
+    books = Book.objects.all()
+    context = {'books': books}  # Pass the list of books in the context
+    return render(request, 'books_list.html', context)
 
 
 class ReservationCreateAPIView(generics.CreateAPIView):

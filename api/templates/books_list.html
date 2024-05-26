@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('books/')  // Change the URL to your API endpoint
+                .then(response => response.json())
+                .then(data => {
+                    let booksContainer = document.getElementById('books-container');
+                    data.forEach(book => {
+                        let bookDiv = document.createElement('div');
+                        bookDiv.classList.add('book'); // Add a class for styling
+                        bookDiv.innerHTML = `
+                            <a href="/books/${book.id}" class="book-link">
+                                <h2 class="book-title">${book.title}</h2>
+                                <p>Author: ${book.author}</p>
+                                <p>Publication Date: ${book.publication_date}</p>
+                                <p>Stock: ${book.stock_quantity}</p>
+                                <img src="${book.image}" alt="${book.title} Cover">
+                            </a>
+                        `;
+                        booksContainer.appendChild(bookDiv);
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        });
+    </script>
+    <style>
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pagination .step-links a {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .pagination .step-links a:hover {
+            background-color: #0056b3;
+        }
+
+        .pagination .current {
+            margin-bottom: 20px;
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #6c757d;
+            color: #fff;
+            border: 1px solid #6c757d;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+        .book-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        .book {
+            margin-left: 25px;
+            text-align: center;
+            width: 200px;
+        }
+
+        .book img {
+            width: 100%;
+            height: auto;
+            border: 1px solid black;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .book img:hover {
+            background-color: #ddd;
+        }
+
+        .book-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+            letter-spacing: 1px;
+        }
+
+        .book-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex-grow: 1;
+        }
+
+        footer {
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+<h1>Books</h1>
+<div id="books-container" class="book-container">
+    {% for book in books %}
+        <div class="book">
+            <a href="{% url 'book-retrieve-update-destroy' book.id %}" class="book-link">
+                <h2 class="book-title">{{ book.title }}</h2>
+                <p>Author: {{ book.author }}</p>
+                <p>Publication Date: {{ book.publication_date }}</p>
+                <p>Stock: {{ book.stock_quantity }}</p>
+                <img src="{{ book.image.url }}" alt="{{ book.title }} Cover">
+            </a>
+        </div>
+    {% endfor %}
+</div>
+</body>
+</html>
