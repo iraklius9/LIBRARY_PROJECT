@@ -50,6 +50,11 @@ class Book(models.Model):
     def reserved_quantity(self):
         return Reservation.objects.filter(book=self).count()
 
+    def num_late_returns(self, obj):
+        return BorrowingHistory.objects.filter(book=obj, late_return=True).count()
+
+    num_late_returns.short_description = 'Late Returns'
+
     class Meta:
         verbose_name = _("Book")
         verbose_name_plural = _("Books")
@@ -99,6 +104,7 @@ class BorrowingHistory(models.Model):
     borrower = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Borrower"), on_delete=models.CASCADE)
     borrowing_date = models.DateTimeField(_("Borrowing Date"))
     returning_date = models.DateTimeField(_("Returning Date"), null=True, blank=True)
+    late_return = models.BooleanField(_("Late Return"), default=False)
 
     def __str__(self):
         return f"{self.book.title} borrowed by {self.borrower.username} on {self.borrowing_date}"

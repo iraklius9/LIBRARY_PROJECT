@@ -1,4 +1,7 @@
 from django.contrib import admin
+from django.db import models
+from django.db.models import Count
+
 from .forms import BorrowingHistoryAdminForm
 from .models import Book, Author, Genre, BookInstance, BorrowingHistory, Reservation
 
@@ -66,12 +69,26 @@ class GenreFilter(admin.SimpleListFilter):
 
 class BookAdmin(admin.ModelAdmin):
     list_display = ['id', 'title', 'author', 'publication_date', 'total_quantity', 'stock_quantity',
-                    'get_num_published', 'reserved_quantity', 'get_num_borrowed']
+                    'get_num_published', 'reserved_quantity', 'get_num_borrowed', 'late_returned']
     list_filter = ['publication_date', GenreFilter]
     search_fields = ['title', 'author__name']
     inlines = [BookInstanceInline, BorrowingHistoryInline]
     list_per_page = 6
     raw_id_fields = ['author', 'genre']
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.annotate(
+            num_borrowed_=Count('bookinstance__borrowinghistory',
+                               filter=models.Q(bookinstance__borrowinghistory__late_return=True))
+        )
+        return qs
+
+    def late_returned(self, obj):
+        return obj.num_borrowed_
+
+    late_returned.admin_order_field = 'num_borrowed'
+    late_returned.short_description = 'Late Returned'
 
     def get_num_borrowed(self, obj):
         return obj.num_borrowed()

@@ -117,6 +117,8 @@ def staff(request):
                     user_reservation.delete()
                     messages.info(request, 'Reservation has been automatically canceled.')
 
+                    Book.objects.filter(id=borrow_instance.book.id).update(stock_quantity=F('stock_quantity') + 1)
+
                 return redirect('books:staff')
 
     context = {'borrow_form': borrow_form}
@@ -155,6 +157,7 @@ def return_book(request):
                     borrower=borrower,
                     borrowing_date=borrowing_date,
                     returning_date=returning_date or timezone.now(),
+                    late_return=late_return
 
                 )
 
