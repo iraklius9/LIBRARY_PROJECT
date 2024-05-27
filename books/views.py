@@ -216,13 +216,50 @@ def check_reservations(request):
         try:
             user = CustomUser.objects.get(email=email)
             user_reservations = Reservation.objects.filter(user=user)
-            if user_reservations:
-                return render(request, 'reservation_check.html', {'user_reservations': user_reservations})
+            if user_reservations.exists():
+                return render(request, 'reservation_check.html', {
+                    'user_reservations': user_reservations,
+                    'user_emails': CustomUser.objects.values_list('email', flat=True)
+                })
             else:
-                messages.info(request, 'You do not have any reservations.')
-                return render(request, 'reservation_check.html')
+                messages.info(request, 'This user does not have any reservations.')
+                return render(request, 'reservation_check.html', {
+                    'user_emails': CustomUser.objects.values_list('email', flat=True)
+                })
         except CustomUser.DoesNotExist:
             messages.error(request, 'User with this email does not exist.')
-            return render(request, 'reservation_check.html')
+            return render(request, 'reservation_check.html', {
+                'user_emails': CustomUser.objects.values_list('email', flat=True)
+            })
 
-    return render(request, 'reservation_check.html')
+    return render(request, 'reservation_check.html', {
+        'user_emails': CustomUser.objects.values_list('email', flat=True)
+    })
+
+
+@login_required
+def check_borrowing(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = CustomUser.objects.get(email=email)
+            user_borrowings = BookInstance.objects.filter(borrower=user, status='On loan')
+            if user_borrowings.exists():
+                return render(request, 'borrowing_check.html', {
+                    'user_borrowings': user_borrowings,
+                    'user_emails': CustomUser.objects.values_list('email', flat=True)
+                })
+            else:
+                messages.info(request, 'This user does not have any borrowed books.')
+                return render(request, 'borrowing_check.html', {
+                    'user_emails': CustomUser.objects.values_list('email', flat=True)
+                })
+        except CustomUser.DoesNotExist:
+            messages.error(request, 'User with this email does not exist.')
+            return render(request, 'borrowing_check.html', {
+                'user_emails': CustomUser.objects.values_list('email', flat=True)
+            })
+
+    return render(request, 'borrowing_check.html', {
+        'user_emails': CustomUser.objects.values_list('email', flat=True)
+    })
