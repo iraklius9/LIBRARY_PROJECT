@@ -145,14 +145,23 @@ def return_book(request):
                     book_instance.returned_date = returning_date
                 book_instance.save()
 
+                late_return = False
+                if returning_date and returning_date > borrowing_date:
+                    late_return = True
+
                 BorrowingHistory.objects.create(
                     book_instance=book_instance,
                     book=book_instance.book,
                     borrower=borrower,
                     borrowing_date=borrowing_date,
-                    returning_date=returning_date or timezone.now()
+                    returning_date=returning_date or timezone.now(),
+
                 )
-                messages.success(request, 'Book has been successfully marked as returned.')
+
+                if late_return:
+                    messages.warning(request, 'Book returned late.')
+                else:
+                    messages.success(request, 'Book has been successfully marked as returned.')
             except BookInstance.DoesNotExist:
                 messages.error(request, 'No matching book instance found for the given book and borrower.')
             return redirect('books:return_book')
