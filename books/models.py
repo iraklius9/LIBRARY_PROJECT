@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from books.choices import STATUS_CHOICES
 
 
 class Genre(models.Model):
@@ -61,13 +62,6 @@ class Book(models.Model):
 
 
 class BookInstance(models.Model):
-    STATUS_CHOICES = [
-        ('On loan', _('On loan')),
-        ('Maintenance', _('Maintenance')),
-        ('Reserved', _('Reserved')),
-        ('Returned', _('Returned')),
-    ]
-
     book = models.ForeignKey(Book, verbose_name=_("Book"), on_delete=models.CASCADE)
     borrower = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Borrower"), on_delete=models.SET_NULL,
                                  null=True, blank=True)

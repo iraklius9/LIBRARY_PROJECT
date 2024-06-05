@@ -140,12 +140,14 @@ def return_book(request):
                 borrowing_date = book_instance.borrowed_date
 
                 book_instance.book.stock_quantity += 1
-                book_instance.book.save()
+                book_instance.book.save(update_fields=['stock_quantity'])
 
                 book_instance.status = 'Returned'
                 if returning_date:
                     book_instance.returned_date = returning_date
-                book_instance.save()
+                    book_instance.save(update_fields=['status', 'returned_date'])
+                else:
+                    book_instance.save(update_fields=['status'])
 
                 late_return = False
                 if returning_date and returning_date > borrowing_date:
