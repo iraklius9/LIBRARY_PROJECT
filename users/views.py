@@ -8,10 +8,6 @@ from users.forms import CustomUserCreationForm, LoginForm
 from django.contrib import messages
 
 
-def home(request):
-    return render(request, 'home.html')
-
-
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)

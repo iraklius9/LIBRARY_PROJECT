@@ -12,13 +12,16 @@ from django.db import transaction
 from users.models import CustomUser
 
 
-@login_required
+def home(request):
+    return render(request, 'home.html')
+
+
 def library(request):
     query = request.GET.get('query', '')
     author = request.GET.get('author', '')
     genre = request.GET.get('genre', '')
 
-    books = Book.objects.all()
+    books = Book.objects.all().order_by('title')
     if query:
         books = books.filter(title__icontains=query)
     if author:
@@ -54,18 +57,22 @@ def library(request):
     return render(request, 'library.html', context)
 
 
-@login_required
 def book_detail(request, pk):
     book = get_object_or_404(Book, pk=pk)
-    user_reservation = Reservation.objects.filter(book=book, user=request.user).first()
-    user_has_reservation = bool(user_reservation)
-    expiration_date = user_reservation.expires_at.strftime('%Y-%m-%d %H:%M:%S') if user_reservation else None
+    user_reservation = None
+    user_has_reservation = False
+    expiration_date = None
 
-    if user_reservation and user_reservation.expires_at < timezone.now():
-        user_reservation.delete()
-        user_reservation = None
-        expiration_date = None
-        user_has_reservation = False
+    if request.user.is_authenticated:
+        user_reservation = Reservation.objects.filter(book=book, user=request.user).first()
+        user_has_reservation = bool(user_reservation)
+        expiration_date = user_reservation.expires_at.strftime('%Y-%m-%d %H:%M:%S') if user_reservation else None
+
+        if user_reservation and user_reservation.expires_at < timezone.now():
+            user_reservation.delete()
+            user_reservation = None
+            expiration_date = None
+            user_has_reservation = False
 
     context = {
         'book': book,
