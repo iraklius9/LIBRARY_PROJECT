@@ -16,8 +16,7 @@ def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
+            form.save()
             request.session['email'] = form.cleaned_data.get('email')
             return redirect('login')
     else:
@@ -42,7 +41,6 @@ def user_login(request):
                 elif user.is_staff:
                     return redirect('books:staff')
             else:
-                form.add_error(None, 'Invalid email or password')
                 messages.error(request, 'Invalid email or password')
     else:
         form = LoginForm(initial={'email': email})

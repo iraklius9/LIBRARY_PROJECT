@@ -11,6 +11,6 @@ class Command(BaseCommand):
         for reservation in expired_reservations:
             book = reservation.book
             book.stock_quantity += 1
-            book.save()
+            book.save(update_fields=['stock_quantity'])
             reservation.delete()
             self.stdout.write(self.style.SUCCESS(f'Stock increased for book {book.title} and reservation canceled'))
