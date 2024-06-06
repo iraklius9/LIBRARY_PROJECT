@@ -16,7 +16,7 @@ from users.models import CustomUser
 
 def book_list_view(request):
     books = Book.objects.all()
-    context = {'books': books}  # Pass the list of books in the context
+    context = {'books': books}
     return render(request, 'books_list.html', context)
 
 

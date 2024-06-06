@@ -68,7 +68,8 @@ def book_detail(request, pk):
         user_has_reservation = bool(user_reservation)
         expiration_date = user_reservation.expires_at.strftime('%Y-%m-%d %H:%M:%S') if user_reservation else None
 
-        if user_reservation and user_reservation.expires_at > timezone.now():
+        if user_reservation and user_reservation.expires_at < timezone.now():
+            book.stock_quantity += 1
             user_reservation.delete()
             user_reservation = None
             expiration_date = None
@@ -84,6 +85,10 @@ def book_detail(request, pk):
 
 @login_required
 def staff(request):
+    if not request.user.is_staff:
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect('books:home')
+
     borrow_form = BorrowForm(request.POST or None)
 
     if request.method == 'POST':
@@ -134,6 +139,9 @@ def staff(request):
 
 @login_required
 def return_book(request):
+    if not request.user.is_staff:
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect('books:home')
     if request.method == 'POST':
         form = ReturnBookForm(request.POST)
         if form.is_valid():
@@ -233,6 +241,9 @@ def cancel_reservation(request, pk):
 
 @login_required
 def check_reservations(request):
+    if not request.user.is_staff:
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect('books:home')
     if request.method == 'POST':
         email = request.POST.get('email')
         try:
@@ -261,6 +272,9 @@ def check_reservations(request):
 
 @login_required
 def check_borrowing(request):
+    if not request.user.is_staff:
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect('books:home')
     if request.method == 'POST':
         email = request.POST.get('email')
         try:

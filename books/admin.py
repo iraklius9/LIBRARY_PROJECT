@@ -75,6 +75,7 @@ class BookAdmin(admin.ModelAdmin):
     inlines = [BookInstanceInline, BorrowingHistoryInline]
     list_per_page = 6
     raw_id_fields = ['author', 'genre']
+    ordering = ['id']
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
