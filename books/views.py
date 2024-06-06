@@ -68,7 +68,7 @@ def book_detail(request, pk):
         user_has_reservation = bool(user_reservation)
         expiration_date = user_reservation.expires_at.strftime('%Y-%m-%d %H:%M:%S') if user_reservation else None
 
-        if user_reservation and user_reservation.expires_at < timezone.now():
+        if user_reservation and user_reservation.expires_at > timezone.now():
             user_reservation.delete()
             user_reservation = None
             expiration_date = None
@@ -144,6 +144,7 @@ def return_book(request):
             try:
                 book_instance = BookInstance.objects.get(book=book, borrower=borrower, status='On loan')
 
+                returned_date = book_instance.returned_date
                 borrowing_date = book_instance.borrowed_date
 
                 book_instance.book.stock_quantity += 1
@@ -157,7 +158,7 @@ def return_book(request):
                     book_instance.save(update_fields=['status'])
 
                 late_return = False
-                if returning_date and returning_date > borrowing_date:
+                if returning_date and returning_date > returned_date:
                     late_return = True
 
                 BorrowingHistory.objects.create(
@@ -192,7 +193,7 @@ def reserve_book(request, pk):
         if not user_reservation:
             if book.stock_quantity > 0:
                 book.stock_quantity -= 1
-                book.save()
+                book.save(update_fields=['stock_quantity'])
             else:
                 messages.warning(request, 'No stock available for this book.')
                 return redirect('books:book_detail', pk=book.pk)
@@ -219,7 +220,7 @@ def cancel_reservation(request, pk):
 
     if user_reservation:
         book.stock_quantity += 1
-        book.save()
+        book.save(update_fields=['stock_quantity'])
 
         user_reservation.delete()
 
