@@ -118,7 +118,7 @@ class GenreListCreate(generics.ListCreateAPIView):
 
 class BookListCreate(generics.ListCreateAPIView):
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     def get_queryset(self):
         queryset = Book.objects.all()
@@ -146,7 +146,7 @@ class BookRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 
 class MostPopularBooksAPIView(generics.ListAPIView):
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     def get_queryset(self):
         return Book.objects.annotate(num_borrowed=Count('borrowinghistory')).order_by('-num_borrowed')[:10]
@@ -154,7 +154,7 @@ class MostPopularBooksAPIView(generics.ListAPIView):
 
 class BooksBorrowedThisYearAPIView(generics.ListAPIView):
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     def get_queryset(self):
         last_year = datetime.now() - timedelta(days=365)
@@ -168,7 +168,7 @@ class BooksBorrowedThisYearAPIView(generics.ListAPIView):
 
 class TopLateReturnedBooksAPIView(generics.ListAPIView):
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     def get_queryset(self):
         return Book.objects.annotate(
@@ -178,15 +178,15 @@ class TopLateReturnedBooksAPIView(generics.ListAPIView):
 
 
 class TopLateReturnedUsersAPIView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
     serializer_class = BookInstanceSerializer
 
     def get_queryset(self):
-        CustomUser = get_user_model()
+        User = get_user_model()
 
-        user_late_return_counts = CustomUser.objects.annotate(
-            num_late_returns=Count('bookinstance',
-                                   filter=Q(bookinstance__returned_date__gt=F('bookinstance__borrowed_date')))
+        user_late_return_counts = User.objects.annotate(
+            num_late_returns=Count('borrowinghistory', filter=Q(
+                borrowinghistory__returning_date__gt=F('borrowinghistory__book_instance__returned_date')))
         ).order_by('-num_late_returns')[:100]
 
         return user_late_return_counts.values('id', 'username', 'num_late_returns')
