@@ -80,13 +80,13 @@ class BookAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         qs = qs.annotate(
-            num_borrowed_=Count('bookinstance__borrowinghistory',
+            num_late_returned=Count('bookinstance__borrowinghistory',
                                filter=models.Q(bookinstance__borrowinghistory__late_return=True))
         )
         return qs
 
     def late_returned(self, obj):
-        return obj.num_borrowed_
+        return obj.num_late_returned
 
     late_returned.admin_order_field = 'num_borrowed'
     late_returned.short_description = 'Late Returned'

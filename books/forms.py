@@ -1,5 +1,5 @@
 from django import forms
-from books.models import BookInstance, Book, BorrowingHistory
+from books.models import BookInstance, Book, BorrowingHistory, Reservation
 from users.models import CustomUser
 
 
@@ -21,15 +21,14 @@ class BorrowForm(forms.ModelForm):
             'returned_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['book'].queryset = Book.objects.filter(stock_quantity__gt=0)
-
     def clean(self):
         cleaned_data = super().clean()
         book = cleaned_data.get('book')
         if book and book.stock_quantity <= 0:
-            raise forms.ValidationError("The selected book is not available for borrowing.")
+            user = cleaned_data.get('borrower')
+            user_reservation = Reservation.objects.filter(book=book, user=user).exists()
+            if not user_reservation:
+                raise forms.ValidationError("The selected book is not available for borrowing.")
         return cleaned_data
 
 

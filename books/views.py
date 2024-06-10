@@ -17,6 +17,9 @@ def home(request):
 
 
 def library(request):
+    if request.user.is_staff:
+        return redirect('books:staff')
+
     query = request.GET.get('query', '')
     author = request.GET.get('author', '')
     genre = request.GET.get('genre', '')
