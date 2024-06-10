@@ -93,7 +93,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'ka-ge'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Tbilisi'
 

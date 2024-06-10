@@ -69,14 +69,17 @@ def book_detail(request, pk):
     if request.user.is_authenticated:
         user_reservation = Reservation.objects.filter(book=book, user=request.user).first()
         user_has_reservation = bool(user_reservation)
-        expiration_date = user_reservation.expires_at.strftime('%Y-%m-%d %H:%M:%S') if user_reservation else None
 
-        if user_reservation and user_reservation.expires_at < timezone.now():
-            book.stock_quantity += 1
-            user_reservation.delete()
-            user_reservation = None
-            expiration_date = None
-            user_has_reservation = False
+        if user_reservation:
+            if user_reservation.expires_at < timezone.now():
+                book.stock_quantity += 1
+                book.save(update_fields=['stock_quantity'])
+                user_reservation.delete()
+                user_reservation = None
+                expiration_date = None
+                user_has_reservation = False
+            else:
+                expiration_date = user_reservation.expires_at
 
     context = {
         'book': book,
