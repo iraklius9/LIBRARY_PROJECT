@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'users',
     'books',
     'api',
+    'django_extensions',
     'rest_framework',
 ]
 

@@ -20,6 +20,8 @@ class AuthorAdmin(admin.ModelAdmin):
     list_display = ['name']
     search_fields = ['name']
 
+    list_per_page = 10
+
 
 class GenreAdmin(admin.ModelAdmin):
     list_display = ['name']
@@ -32,6 +34,8 @@ class BookInstanceAdmin(admin.ModelAdmin):
     search_fields = ['book__title', 'borrower__email']
     date_hierarchy = 'borrowed_date'
     autocomplete_fields = ['book', 'borrower']
+
+    list_per_page = 10
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -81,7 +85,7 @@ class BookAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         qs = qs.annotate(
             num_late_returned=Count('bookinstance__borrowinghistory',
-                               filter=models.Q(bookinstance__borrowinghistory__late_return=True))
+                                    filter=models.Q(bookinstance__borrowinghistory__late_return=True))
         )
         return qs
 
@@ -107,14 +111,23 @@ class ReservationAdmin(admin.ModelAdmin):
     list_filter = ('reserved_at', 'expires_at')
     search_fields = ('user__username', 'book__title')
 
+    list_per_page = 10
+
 
 class BorrowingHistoryAdmin(admin.ModelAdmin):
     form = BorrowingHistoryAdminForm
-    list_display = ['book', 'borrower', 'borrowing_date', 'returning_date']
+    list_display = ['book', 'borrower', 'borrowing_date', 'returning_date', 'book_instance_returned_date', ]
     list_filter = ['borrowing_date']
     search_fields = ['book__title', 'borrower__email']
     date_hierarchy = 'borrowing_date'
     raw_id_fields = ['book', 'borrower']
+
+    list_per_page = 10
+
+    def book_instance_returned_date(self, obj):
+        return obj.book_instance.returned_date
+
+    book_instance_returned_date.short_description = 'Due Date'
 
 
 admin.site.register(Book, BookAdmin)
