@@ -88,7 +88,7 @@ class BookAdmin(admin.ModelAdmin):
     def late_returned(self, obj):
         return obj.num_late_returned
 
-    late_returned.admin_order_field = 'num_borrowed'
+    late_returned.admin_order_field = 'num_late_returned'
     late_returned.short_description = 'Late Returned'
 
     def get_num_borrowed(self, obj):
