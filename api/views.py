@@ -20,6 +20,10 @@ def book_list_view(request):
     return render(request, 'books_list.html', context)
 
 
+def url_patterns_view(request):
+    return render(request, 'url_patterns.html')
+
+
 class ReservationCreateAPIView(generics.CreateAPIView):
     serializer_class = ReservationSerializer
     permission_classes = [IsAuthenticated]
@@ -34,7 +38,6 @@ class ReservationCreateAPIView(generics.CreateAPIView):
 
         mutable_data = request.data.copy()
         mutable_data['user'] = request.user.id
-
         mutable_data['expires_at'] = timezone.now() + timedelta(hours=24)
 
         serializer = self.get_serializer(data=mutable_data)

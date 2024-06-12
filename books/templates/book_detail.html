@@ -109,10 +109,17 @@
     <div class="reservation-form">
         {% if user.is_authenticated %}
             {% if not user_has_reservation %}
-                <form id="reservation-form" method="post" action="{% url 'books:reserve_book' book.id %}">
-                    {% csrf_token %}
-                    <button id="reserve-button" type="submit" class="reservation-button">Reserve Book</button>
-                </form>
+                {% if is_wishlisted %}
+                    <form id="wish-form" method="post" action="{% url 'books:book_detail' book.id %}">
+                        {% csrf_token %}
+                        <button id="wish-button" type="submit" class="reservation-button" name="wish_button">Add to Wishlist</button>
+                    </form>
+                {% else %}
+                    <form id="reservation-form" method="post" action="{% url 'books:reserve_book' book.id %}">
+                        {% csrf_token %}
+                        <button id="reserve-button" type="submit" class="reservation-button">Reserve Book</button>
+                    </form>
+                {% endif %}
             {% else %}
                 <form id="cancel-reservation-form" method="post" action="{% url 'books:cancel_reservation' book.id %}">
                     {% csrf_token %}
@@ -131,7 +138,6 @@
             {% endif %}
         {% else %}
             <p style="color: red;">You must be logged in to reserve this book</p>
-
             <a href="{% url 'books:home' %}">Login or Register Here </a>
         {% endif %}
     </div>

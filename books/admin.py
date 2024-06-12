@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.db import models
 from django.db.models import Count
 
-from .forms import BorrowingHistoryAdminForm
-from .models import Book, Author, Genre, BookInstance, BorrowingHistory, Reservation
+from books.forms import BorrowingHistoryAdminForm
+from books.models import Book, Author, Genre, BookInstance, BorrowingHistory, Reservation, WishList
 
 
 class BorrowingHistoryInline(admin.TabularInline):
@@ -130,9 +130,16 @@ class BorrowingHistoryAdmin(admin.ModelAdmin):
     book_instance_returned_date.short_description = 'Due Date'
 
 
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ['user', 'book']
+    search_fields = ['user__username', 'book__title']
+    list_per_page = 10
+
+
 admin.site.register(Book, BookAdmin)
 admin.site.register(BookInstance, BookInstanceAdmin)
 admin.site.register(BorrowingHistory, BorrowingHistoryAdmin)
 admin.site.register(Reservation, ReservationAdmin)
 admin.site.register(Genre, GenreAdmin)
 admin.site.register(Author, AuthorAdmin)
+admin.site.register(WishList, WishlistAdmin)

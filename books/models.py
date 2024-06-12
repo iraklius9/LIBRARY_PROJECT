@@ -106,3 +106,13 @@ class BorrowingHistory(models.Model):
     class Meta:
         verbose_name = _("Borrowing History")
         verbose_name_plural = _("Borrowing Histories")
+
+
+class WishList(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"), on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, verbose_name=_("Book"), on_delete=models.CASCADE)
+    added_at = models.DateTimeField(_("Added At"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Wish List")
+        verbose_name_plural = _("Wish Lists")

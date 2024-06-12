@@ -6,9 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import F
 from django.contrib import messages
 from books.forms import BorrowForm, ReturnBookForm
-from books.models import Book, Reservation, BookInstance, BorrowingHistory
+from books.models import Book, Reservation, BookInstance, BorrowingHistory, WishList
 from django.db import transaction
-
 from users.models import CustomUser
 
 
@@ -62,9 +61,9 @@ def library(request):
 
 def book_detail(request, pk):
     book = get_object_or_404(Book, pk=pk)
-    user_reservation = None
     user_has_reservation = False
     expiration_date = None
+    is_wishlisted = False
 
     if request.user.is_authenticated:
         user_reservation = Reservation.objects.filter(book=book, user=request.user).first()
@@ -75,16 +74,30 @@ def book_detail(request, pk):
                 book.stock_quantity += 1
                 book.save(update_fields=['stock_quantity'])
                 user_reservation.delete()
-                user_reservation = None
                 expiration_date = None
                 user_has_reservation = False
             else:
                 expiration_date = user_reservation.expires_at
 
+        if book.stock_quantity == 0:
+            is_wishlisted = True
+
+    if request.method == 'POST' and 'wish_button' in request.POST:
+        if request.user.is_authenticated:
+            if not WishList.objects.filter(user=request.user, book=book).exists():
+                WishList.objects.create(user=request.user, book=book)
+                messages.success(request, f'Added {book.title} to your wish list.')
+            else:
+                messages.warning(request, f'{book.title} is already in your wish list.')
+        else:
+            messages.error(request, 'You must be logged in to add books to your wish list.')
+        return redirect('books:book_detail', pk=pk)
+
     context = {
         'book': book,
         'user_has_reservation': user_has_reservation,
         'expiration_date': expiration_date,
+        'is_wishlisted': is_wishlisted,
     }
     return render(request, 'book_detail.html', context)
 

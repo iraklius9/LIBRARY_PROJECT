@@ -2,7 +2,7 @@ from django.urls import path
 from .views import AuthorListCreate, GenreListCreate, BookListCreate, BookRetrieveUpdateDestroy, \
     ReservationCreateAPIView, ReservationCheckAPIView, MostPopularBooksAPIView, \
     BooksBorrowedThisYearAPIView, TopLateReturnedBooksAPIView, TopLateReturnedUsersAPIView, BookReturnAPIView, \
-    SortedBookList, book_list_view
+    SortedBookList, book_list_view, url_patterns_view
 
 urlpatterns = [
     path('authors/', AuthorListCreate.as_view(), name='author-list-create'),
@@ -18,4 +18,5 @@ urlpatterns = [
     path('return/<int:pk>/', BookReturnAPIView.as_view(), name='book-return'),
     path('books/sorted/', SortedBookList.as_view(), name='sorted-book-list'),
     path('books_list/', book_list_view, name='book-list'),
+    path('url-patterns/', url_patterns_view, name='url-patterns')
 ]

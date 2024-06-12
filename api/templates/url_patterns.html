@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Patterns</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>URL Patterns</h1>
+        <ul>
+            <li><a href="{% url 'author-list-create' %}">Author List/Create</a></li>
+            <li><a href="{% url 'genre-list-create' %}">Genre List/Create</a></li>
+            <li><a href="{% url 'book-list-create' %}">Book List/Create</a></li>
+            <li><a href="{% url 'book-retrieve-update-destroy' pk=1 %}">Book Retrieve/Update/Destroy</a></li>
+            <li><a href="{% url 'api_reserve_book' %}">Reserve Book</a></li>
+            <li><a href="{% url 'api_check_reservation' %}">Check Reservation</a></li>
+            <li><a href="{% url 'most-popular-books' %}">Most Popular Books</a></li>
+            <li><a href="{% url 'books-borrowed-this-year' %}">Books Borrowed This Year</a></li>
+            <li><a href="{% url 'top-late-returned-books' %}">Top Late Returned Books</a></li>
+            <li><a href="{% url 'top-late-returned-users' %}">Top Late Returned Users</a></li>
+            <li><a href="{% url 'book-return' pk=1 %}">Book Return</a></li>
+            <li><a href="{% url 'sorted-book-list' %}">Sorted Book List</a></li>
+            <li><a href="{% url 'book-list' %}">Book List</a></li>
+        </ul>
+    </div>
+</body>
+</html>
